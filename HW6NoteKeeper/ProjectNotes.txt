@@ -1,0 +1,87 @@
+Homework 6: HW6NoteKeeper
+Shawn Joseph / shj006@g.harvard.edu
+Deployment: https://assignment6shawnjoseph.azurewebsites.net/index.html
+server name: assignment6shawnjoseph
+API Management Name: ShawnJosephAssignmentSixAPIManagement
+API Management URL: https://shawnjosephassignmentsixapimanagement.azure-api.net
+SQL Server: assignmentsix.database.windows.net
+Basic subscription primary key: e65917f183d34846bf11d54e80833a01
+Standard subscription primary key: 41d6ecc4aa2044dc9057c11a0550d9dc
+The modified SQl file is within this project
+
+I have left the SQL server I used in Assignment 3 up as it has not been graded for me yet
+
+Azure Service
+1.  Use https://portal.azure.com/#create/Microsoft.WebSite to create a new group and F1 host. Choose the options to publish code, 
+    use .Net 7, use the same Linux plan, and use an F1 CPU. Select yes for Application monitoring and use all other defaults.
+SQL Server
+2.  Go to https://portal.azure.com/#create/Microsoft.SQLDatabase
+3. Create a new resource group named rg-sqldata and select that as the resource group to use.
+4. Select the option to create a new SQL server.
+5. Select the option to use an SQL user, named dbadmin, and Azure AD Authentication, and set a user in your domain 
+as an admin.
+6. Configure the database to use the basic tier for resources.
+7. Set up your database such that it is not using an SQL elastic pool, it is using locally redundant backup storage,
+it is using a DTU-based purchasing, it is using the basic tier, and it has a memory of 2GB and 5 DTU's.
+Make sure you edit the firewall rules so that your IP and Azure can access the server.
+8. Create a new V3 blob storage account on the Azure storage page in the same resource group.
+9. Open the project in Visual Studio 2022. 
+10. Go to the database -> connection strings on Azure and copy the connection string into ConnectionStrings[SQL] in 
+appsettings.json in Visual Studio. Make sure to set the user password.
+11. Copy the connection string from the blob storage page for the V3 Blob Service you created
+to ConnectionStrings[Storage] in appsettings.json.
+12. Copy the connection string for the Azure Application Insights instance created in step 1
+ and copy it into ConnectionStrings[Telemetry] in appsettings.json.
+13.  Open the project in Visual Studio 2022. Make sure you have .Net 7 installed.
+14.  Go to Build -> Publish
+15.  Select Azure as the targetA
+16.  Select Azure App Service (Linux)
+17.  Choose the hosting group you created in step 1.
+18. Click finish.
+19. Click Publish
+21. Create a new Windows .Net 7 Azure Function on the consumption plan in the same region as the Azure blob service.
+22. Open FunctionApp2 in Visual Studio and select Publish -> Publish to Azure Windows App Service.
+23. Find the Azure function you created in step 21 and select it.
+24. Click Publish.
+
+API Management
+25. Create the Azure API Management Service using the consumption tier, use HTTP/2 and TLS 1.1.
+26. Add the path to the swagger.json file to the API Management Service API definition section.
+27. Create the Note Keeper Basic API in the management service and override the URL to point to your app service instance.
+28. Create the Note Keeper Standard API in the management service and override the URL to point to your app service instance.
+29. Remove all of the ZIP and attachment functions from the Note Keeper Basic API.
+30. Create subscriptions for both the Basic and Standard APIs.
+
+API Management Cache
+31. Create a new Redis cache at the basic tier.
+32. Go to your Azure API Management Service -> External Cache and select the Redis cache you created in step 31.
+33. For the operation to retrieve notes in the Note Keeper Basic API, the operation to retrieve notes in the Note Keeper Standard API,
+and the operation to retrieve attachments in the Note Keeper Standard API, set the XML policy to the following:
+<policies>
+    <inbound>
+        <cache-lookup vary-by-developer="false" vary-by-developer-groups="false" allow-private-response-caching="true" must-revalidate="false" downstream-caching-type="none" caching-type="external">
+            <vary-by-header>Accept</vary-by-header>
+            <vary-by-header>Accept-Charset</vary-by-header>
+            <vary-by-header>Authorization</vary-by-header>
+        </cache-lookup>
+        <base />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <cache-store duration="20" />
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
+
+JSON to XML Policy:
+34. For all operations except attachment and attachmentzipfiles, add the following XML policy to the outbound section:
+ <choose>
+            <when condition="@(context.Request.Headers.GetValueOrDefault("Accept", "") == "application/xml")">
+                <json-to-xml apply="always" consider-accept-header="false" />
+            </when>
+ </choose>

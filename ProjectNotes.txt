@@ -1,0 +1,19 @@
+Azure Service
+1.  Use https://portal.azure.com/#create/Microsoft.WebSite to create a new group and F1 host. Choose the options to publish code, 
+    use .Net 7, use a Linux plan, and use an F1 CPU. Select no for Application monitoring and use all other defaults.
+1.  Open the project in Visual Studio 2022. Make sure you have .Net 7 installed.
+2.  Go to Build -> Publish
+3.  Select Azure as the target
+4.  Select Azure App Service (Linux)
+5.  Choose the hosting group and API management you created in step 1.
+10. Click finish.
+11. Click Publish
+12. Click the URL to open the application.
+
+Console Web Interface
+1. Click ConsoleApp1
+2. Click Run
+
+Xunit tests (incomplete)
+1. Right click TestProject1
+2. Click "Run Tests"

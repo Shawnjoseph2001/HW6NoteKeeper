@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "apis1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/ShawnJosephAssignment3/apis/AssignmentThree",
+      "type": "apis.azure"
+    }
+  }
+}
